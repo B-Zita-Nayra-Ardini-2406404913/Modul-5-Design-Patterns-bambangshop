@@ -77,6 +77,9 @@ This is the place for you to write reflections:
 ### Mandatory (Publisher) Reflections
 
 #### Reflection Publisher-1
+1. Dalam kasus BambangShop ini, single struct sudah cukup karena subscriber hanya memiliki satu jenis perilaku yang sama semua, yaitu menerima notifikasi melalui HTTP POST ke URL yang sudah ditentukan. Trait atau interface dalam Observer pattern diperlukan jika terdapat multiple jenis subscriber dengan perilaku notify yang berbeda-beda. Karena di sini semua subscriber memiliki cara notifikasi yang sama, menggunakan struct saja sudah cukup.
+2. Vec tidak cukup karena beberapa alasan. Pertama, operasi insert, delete, dan lookup membutuhkan kecepatan tinggi dimana DashMap memberikan akses O(1) sementara Vec memerlukan iterasi O(n) yang lambat. Lalu, aplikasi bersifat concurrent sehingga membutuhkan thread safety yang dimana DashMap sudah menyediakannya secara bawaan, sedangkan Vec harus dibungkus Mutex/RwLock yang kurang efisien. Selain itu, URL bersifat unik sehingga lebih cocok dijadikan key dalam map, memungkinkan akses langsung tanpa iterasi seperti pada Vec.
+3. Tetap perlu DashMap karena Singleton pattern hanya menjamin satu instance global, tetapi tetap tidak menjamin thread safety pada operasi concurrent. Dalam Rust, static mutable variable tidak diizinkan diubah dengan mudah. DashMap adalah solusi yang pas karena memberikan thread-safe concurrent HashMap tanpa perlu menggunakan Mutex yang bisa menyebabkan blocking. Singleton pattern saja tidak cukup karena kita tetap membutuhkan struktur data yang aman untuk diakses dan dimutasi oleh multiple threads secara bersamaan, sementara DashMap menyediakan fine-grained locking yang lebih efisien.
 
 #### Reflection Publisher-2
 
